@@ -18,13 +18,14 @@ then
 	MYUSER=$(cat ~/.upload/info | cut -d: -f 2)
 	MYADRESS=$(cat ~/.upload/info | cut -d: -f 3)
 	MYPATH=$(cat ~/.upload/info | cut -d: -f 4)
+	FOLDER=$(echo $MYPASS | cut -d/ -f 4-)
 	MYPASS=`echo "$MYENCPASS" | base64 --decode`
 	NBRPARAM=$#
 	
 	for (( i = 1; i <= $NBRPARAM; i++ )); do
 		if sshpass -p "$MYPASS" scp $1 $MYUSER@$MYADRESS:$MYPATH
 		then
-			echo "$i : http://www.$MYADRESS/uploads/$1"
+			echo "$i : http://www.$MYADRESS/$FOLDER/$1"
 		else
 			echo "Il y a eu un problème, vérifiez votre configuration, vous pouvez reconfigurer en tapant \"upload --config\"" 
 		fi
