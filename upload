@@ -1,0 +1,37 @@
+#!/bin/bash
+function config {
+	while [[ -z $instadresse ]]; do echo -n 'Entrez l'"'"'adresse du serveur : '; read instadresse; done
+	echo -n 'Entrez votre nom de compte (par défaut "root") : ' 
+	read instuser
+	if [[ -z $instuser ]]; then instuser="root"; fi
+	while [[ -z $instpass ]]; do echo -n 'Entrez votre mot de passe : '; read -s instpass; instpass=$(echo "$instpass" | base64); echo; done
+	echo -n 'Entrez le chemin (par défaut "~") : ' 
+	read instpath
+	if [[ -z $instpath ]]; then instpath="~"; fi
+	if [[ ! -d ~/.upload/ ]]; then mkdir ~/.upload/; fi
+	echo "$instpass:$instuser:$instadresse:$instpath" > ~/.upload/info && chmod 700 ~/.upload/info
+}
+if [ $1 = "--config" ] ; then rm ~/.upload/info; fi
+if [[ -f ~/.upload/info ]]
+then
+	MYENCPASS=$(cat ~/.upload/info | cut -d: -f 1)
+	MYUSER=$(cat ~/.upload/info | cut -d: -f 2)
+	MYADRESS=$(cat ~/.upload/info | cut -d: -f 3)
+	MYPATH=$(cat ~/.upload/info | cut -d: -f 4)
+	MYPASS=`echo "$MYENCPASS" | base64 --decode`
+	NBRPARAM=$#
+	
+	for (( i = 1; i <= $NBRPARAM; i++ )); do
+		if sshpass -p "$MYPASS" scp $1 $MYUSER@$MYADRESS:$MYPATH
+		then
+			echo "$i : http://www.$MYADRESS/uploads/$1"
+		else
+			echo "Il y a eu un problème, vérifiez votre configuration, vous pouvez reconfigurer en tapant \"upload --config\"" 
+		fi
+		shift
+	done
+	
+else
+	config;
+fi
+exit
