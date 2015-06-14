@@ -18,8 +18,8 @@ then
 	MYUSER=$(cat ~/.upload/info | cut -d: -f 2)
 	MYADRESS=$(cat ~/.upload/info | cut -d: -f 3)
 	MYPATH=$(cat ~/.upload/info | cut -d: -f 4)
-	FOLDER=$(echo $MYPASS | cut -d/ -f 4-)
-	MYPASS=`echo "$MYENCPATH" | base64 --decode`
+	FOLDER=$(echo $MYPATH | cut -d/ -f 4-)
+	MYPASS=`echo "$MYENCPASS" | base64 --decode`
 	NBRPARAM=$#
 	
 	for (( i = 1; i <= $NBRPARAM; i++ )); do
